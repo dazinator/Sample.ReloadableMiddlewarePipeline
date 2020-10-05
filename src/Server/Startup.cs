@@ -21,7 +21,17 @@ namespace Server
         public void ConfigureServices(IServiceCollection services)
         {
             var configSection = Configuration.GetSection("Pipeline");
-            services.ConfigureReloadablePipeline<PipelineOptions>(configSection, ConfigureReloadablePipeline);
+            services.Configure<PipelineOptions>(configSection);
+        }
+
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {            
+            // Note: Use vs Run (latter is terminal, former is not)
+            // make a change to appsettings.json "Pipelines" section and watch log output in console on furture requests.
+            app.UseReloadablePipeline<PipelineOptions>(ConfigureReloadablePipeline);
+            app.UseWelcomePage();
         }
 
         private void ConfigureReloadablePipeline(IApplicationBuilder appBuilder, IWebHostEnvironment environment, PipelineOptions options)
@@ -48,17 +58,5 @@ namespace Server
                 });
             }
         }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {            
-            // Note: Use vs Run (latter is terminal, former is not)
-            // make a change to appsettings.json "Pipelines" section and watch log output in console on furture requests.
-            app.UseReloadablePipeline<PipelineOptions>();
-            app.UseWelcomePage();
-
-
-        }
     }
-
 }

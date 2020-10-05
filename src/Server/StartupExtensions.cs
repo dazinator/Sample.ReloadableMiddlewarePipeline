@@ -8,34 +8,29 @@ using Microsoft.Extensions.Options;
 namespace Server
 {
     public static class StartupExtensions
-    {
-        public static IServiceCollection ConfigureReloadablePipeline<TOptions>(this IServiceCollection services,
-            IConfiguration configuration, Action<IApplicationBuilder, IWebHostEnvironment, TOptions> configure)
-            where TOptions : class
-        {
-            services.Configure<TOptions>(configuration);
-            services.AddSingleton<RequestDelegateFactory<TOptions>>(sp =>
-            {
-                //ActivatorUtilities.CreateInstance<RequestDelegateFactory<TOptions>>(sp, configure);
-                var environment = sp.GetRequiredService<IWebHostEnvironment>();
-                var options = sp.GetRequiredService<IOptionsMonitor<TOptions>>();
-                return new RequestDelegateFactory<TOptions>(environment, options, configure);
-            });
-            return services;
-        }
-        public static IApplicationBuilder UseReloadablePipeline<TOptions>(this IApplicationBuilder builder)
+    {        
+        public static IApplicationBuilder UseReloadablePipeline<TOptions>(this IApplicationBuilder builder,
+            Action<IApplicationBuilder, IWebHostEnvironment, TOptions> configure)
         where TOptions : class
         {
-            var isTerminal = false;
-            builder.UseMiddleware<ReloadPipelineMiddleware<TOptions>>(builder, isTerminal);
-            return builder;
+            return AddReloadablePipeline<TOptions>(builder, configure, false);
         }
 
-        public static IApplicationBuilder RunReloadablePipeline<TOptions>(this IApplicationBuilder builder)
+        public static IApplicationBuilder RunReloadablePipeline<TOptions>(this IApplicationBuilder builder, Action<IApplicationBuilder, IWebHostEnvironment, TOptions> configure)
       where TOptions : class
         {
-            var isTerminal = true;
-            builder.UseMiddleware<ReloadPipelineMiddleware<TOptions>>(builder, isTerminal);
+            return AddReloadablePipeline<TOptions>(builder, configure,  true);
+        }
+
+        private static IApplicationBuilder AddReloadablePipeline<TOptions>(this IApplicationBuilder builder, Action<IApplicationBuilder, IWebHostEnvironment, TOptions> configure, bool isTerminal)
+    where TOptions : class
+        {
+            var env = builder.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
+            var monitor = builder.ApplicationServices.GetRequiredService<IOptionsMonitor<TOptions>>();
+
+            var factory = new RequestDelegateFactory<TOptions>(env, monitor, configure);
+
+            builder.UseMiddleware<ReloadPipelineMiddleware<TOptions>>(builder, factory, isTerminal);
             return builder;
         }
     }

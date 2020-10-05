@@ -1,5 +1,7 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
 namespace Server
@@ -13,8 +15,8 @@ namespace Server
         private readonly bool _isTerminal;
 
         public ReloadPipelineMiddleware(
-            RequestDelegate next,
-            RequestDelegateFactory<TOptions> factory, IApplicationBuilder rootBuilder, bool isTerminal)
+            RequestDelegate next,            
+            IApplicationBuilder rootBuilder, RequestDelegateFactory<TOptions> factory, bool isTerminal)
         {
             _next = next;
             _factory = factory;
