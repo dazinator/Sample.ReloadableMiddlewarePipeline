@@ -18,7 +18,9 @@ namespace Server
 
         public IApplicationBuilder _subBuilder { get; set; }
 
-        public RequestDelegateFactory(IWebHostEnvironment environment, IOptionsMonitor<TOptions> optionsMonitor, Action<IApplicationBuilder, IWebHostEnvironment, TOptions> configure)
+        public RequestDelegateFactory(IWebHostEnvironment environment,
+            IOptionsMonitor<TOptions> optionsMonitor,
+            Action<IApplicationBuilder, IWebHostEnvironment, TOptions> configure)
         {
             _environment = environment;
             _optionsMonitor = optionsMonitor;
@@ -61,7 +63,7 @@ namespace Server
 
 
                 // as we don't lock in Invalidate(), it could have just set _currentRequestDelegate back to null here,
-                // that's why we keep hold of and return, newInstance.
+                // that's why we keep hold of and return, newInstance - as this method must always return an instance to satisfy current request.
                 return newInstance;
             }
         }

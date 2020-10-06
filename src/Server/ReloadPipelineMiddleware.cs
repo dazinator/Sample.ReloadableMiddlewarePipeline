@@ -16,7 +16,8 @@ namespace Server
 
         public ReloadPipelineMiddleware(
             RequestDelegate next,            
-            IApplicationBuilder rootBuilder, RequestDelegateFactory<TOptions> factory, bool isTerminal)
+            IApplicationBuilder rootBuilder, 
+            RequestDelegateFactory<TOptions> factory, bool isTerminal)
         {
             _next = next;
             _factory = factory;
