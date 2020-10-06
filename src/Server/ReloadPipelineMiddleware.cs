@@ -1,23 +1,20 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
 namespace Server
 {
-    public class ReloadPipelineMiddleware<TOptions>
-       where TOptions : class
+    public class ReloadPipelineMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly RequestDelegateFactory<TOptions> _factory;
+        private readonly RequestDelegateFactory _factory;
         private readonly IApplicationBuilder _rootBuilder;
         private readonly bool _isTerminal;
 
         public ReloadPipelineMiddleware(
             RequestDelegate next,            
             IApplicationBuilder rootBuilder, 
-            RequestDelegateFactory<TOptions> factory, bool isTerminal)
+            RequestDelegateFactory factory, bool isTerminal)
         {
             _next = next;
             _factory = factory;
@@ -30,6 +27,5 @@ namespace Server
             var requestDelegate = _factory.Get(_rootBuilder, _next, _isTerminal);
             await requestDelegate.Invoke(context);
         }
-
     }
 }
